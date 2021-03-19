@@ -1,10 +1,6 @@
-package com.example.myapplication.stuff
+package com.example.myapplication.camera
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
@@ -12,7 +8,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.example.myapplication.BuildConfig
 import com.google.common.util.concurrent.ListenableFuture
 
 abstract class CameraActivity : AppCompatActivity() {
@@ -30,31 +25,6 @@ abstract class CameraActivity : AppCompatActivity() {
             val cameraProvider = cameraProviderFuture.get()
             bindPreview(cameraProvider)
         }, ContextCompat.getMainExecutor(this))
-    }
-
-    protected fun openSettings() {
-        startActivity(
-            Intent(
-                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.parse("package:" + BuildConfig.APPLICATION_ID)
-            )
-        )
-    }
-
-    protected fun showAlertDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Androidly Alert")
-            .setMessage("We have a message")
-            .setPositiveButton(android.R.string.yes) { dialog, which ->
-
-            }
-            .setNegativeButton(android.R.string.no) { dialog, which ->
-
-            }
-            .setNeutralButton("Maybe") { dialog, which ->
-
-            }
-            .show()
     }
 
     private fun bindPreview(cameraProvider: ProcessCameraProvider) {
