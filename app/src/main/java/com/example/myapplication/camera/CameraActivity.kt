@@ -1,13 +1,13 @@
 package com.example.myapplication.camera
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
 
 abstract class CameraActivity : AppCompatActivity() {
@@ -21,23 +21,24 @@ abstract class CameraActivity : AppCompatActivity() {
     }
 
     protected fun launchCamera() {
-        cameraProviderFuture.addListener(Runnable {
+        cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
             bindPreview(cameraProvider)
         }, ContextCompat.getMainExecutor(this))
     }
 
     private fun bindPreview(cameraProvider: ProcessCameraProvider) {
-        val preview: Preview = Preview.Builder()
-            .build()
 
-        val cameraSelector: CameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-            .build()
+        val preview: Preview = Preview.Builder().build().apply {
+            setSurfaceProvider(previewView.surfaceProvider)
+        }
 
-        val camera = cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview)
-
-        preview.setSurfaceProvider(previewView.createSurfaceProvider(camera.cameraInfo))
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview)
+        } catch (exc: Exception) {
+            Toast.makeText(this, "Use case binding failed", Toast.LENGTH_SHORT).show()
+        }
     }
 
 }
